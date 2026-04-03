@@ -2,6 +2,15 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
+const LogoMark = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="10" fill="var(--accent)" fillOpacity="0.15" />
+    <path d="M9 18C9 13.582 12.582 10 17 10C21.418 10 25 13.582 25 18" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" />
+    <path d="M13 22.5L17 18.5L21 22.5" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="17" cy="18.5" r="2" fill="var(--accent)" />
+  </svg>
+);
+
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,73 +48,63 @@ const RegisterPage = () => {
     }
   };
 
-  const inputStyle = {
-    background: 'var(--bg-elevated)',
-    border: '1px solid var(--border)',
-    color: 'var(--text-primary)',
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'var(--accent)';
-  };
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'var(--border)';
-  };
-
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: 'var(--bg-base)' }}
-    >
+    <div className="bg-grid min-h-screen flex items-center justify-center px-4 py-12">
       <div
-        className="w-full max-w-md p-8 rounded-2xl"
-        style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          boxShadow: '0 0 0 1px rgba(124,106,247,0.06), 0 4px 24px rgba(0,0,0,0.4)',
-        }}
+        className="card-glass w-full max-w-sm rounded-2xl p-8"
+        style={{ borderColor: 'rgba(124,106,247,0.18)' }}
       >
         {/* Logo */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>
+        <div className="flex flex-col items-center mb-8">
+          <LogoMark />
+          <h1 className="mt-3 text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             ExpenseTracker
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Create your account
           </p>
         </div>
 
         {success ? (
           <div
-            className="px-6 py-8 rounded-xl text-center space-y-3"
+            className="px-6 py-8 rounded-2xl text-center space-y-3"
             style={{
-              background: 'rgba(52,211,153,0.1)',
-              border: '1px solid rgba(52,211,153,0.3)',
+              background: 'rgba(52,211,153,0.06)',
+              border: '1px solid rgba(52,211,153,0.25)',
             }}
           >
-            <div className="text-4xl">📬</div>
-            <p className="font-semibold" style={{ color: 'var(--income)' }}>
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center mx-auto"
+              style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--income)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </div>
+            <p className="font-semibold text-base" style={{ color: 'var(--income)' }}>
               Check your email!
             </p>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              We've sent a confirmation link to <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>.
+              We've sent a confirmation link to{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>.
               Click it to activate your account.
             </p>
             <Link
               to="/login"
-              className="inline-block mt-4 text-sm font-medium"
+              className="inline-block mt-2 text-sm font-semibold"
               style={{ color: 'var(--accent)' }}
             >
               Back to Sign In →
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label
                 htmlFor="email"
-                className="block text-xs font-medium uppercase tracking-wider"
+                className="block text-xs font-semibold uppercase tracking-wider"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Email
@@ -118,18 +117,20 @@ const RegisterPage = () => {
                 required
                 autoComplete="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors"
-                style={inputStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               />
             </div>
 
             {/* Password */}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label
                 htmlFor="password"
-                className="block text-xs font-medium uppercase tracking-wider"
+                className="block text-xs font-semibold uppercase tracking-wider"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Password
@@ -142,18 +143,20 @@ const RegisterPage = () => {
                 required
                 autoComplete="new-password"
                 placeholder="Min. 6 characters"
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors"
-                style={inputStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               />
             </div>
 
             {/* Confirm Password */}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label
                 htmlFor="confirmPassword"
-                className="block text-xs font-medium uppercase tracking-wider"
+                className="block text-xs font-semibold uppercase tracking-wider"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Confirm Password
@@ -166,10 +169,12 @@ const RegisterPage = () => {
                 required
                 autoComplete="new-password"
                 placeholder="Repeat password"
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors"
-                style={inputStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
+                }}
               />
             </div>
 
@@ -178,8 +183,8 @@ const RegisterPage = () => {
               <div
                 className="px-4 py-3 rounded-xl text-sm"
                 style={{
-                  background: 'rgba(248,113,113,0.1)',
-                  border: '1px solid rgba(248,113,113,0.3)',
+                  background: 'rgba(248,113,113,0.08)',
+                  border: '1px solid rgba(248,113,113,0.25)',
                   color: 'var(--expense)',
                 }}
               >
@@ -191,14 +196,7 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: 'var(--accent)', color: '#fff' }}
-              onMouseEnter={(e) => {
-                if (!isLoading) e.currentTarget.style.background = 'var(--accent-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--accent)';
-              }}
+              className="btn-accent w-full py-3 rounded-xl text-sm mt-2"
             >
               {isLoading ? 'Creating account…' : 'Create Account'}
             </button>
@@ -210,14 +208,10 @@ const RegisterPage = () => {
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-medium"
+              className="font-semibold transition-colors"
               style={{ color: 'var(--accent)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--accent-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--accent)';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
             >
               Sign in
             </Link>

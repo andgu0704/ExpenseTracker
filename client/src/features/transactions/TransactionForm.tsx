@@ -28,6 +28,22 @@ const REVENUE_CATEGORIES = [
 
 const todayStr = () => new Date().toISOString().split('T')[0];
 
+// ── SVG Icons ─────────────────────────────────────────────────────────────────
+
+const IconExpense = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+    <polyline points="17 18 23 18 23 12" />
+  </svg>
+);
+
+const IconRevenue = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+    <polyline points="17 6 23 6 23 12" />
+  </svg>
+);
+
 /**
  * Shared form component for creating and editing transactions.
  * Handles type-aware category grids, validation, and submit logic.
@@ -47,7 +63,6 @@ const TransactionForm = ({ defaultValues, onSubmit, isLoading }: TransactionForm
 
   const handleTypeChange = (newType: 'expense' | 'revenue') => {
     setType(newType);
-    // Auto-select first category of new type
     const cats = newType === 'expense' ? EXPENSE_CATEGORIES : REVENUE_CATEGORIES;
     setCategory(cats[0].key);
   };
@@ -66,22 +81,18 @@ const TransactionForm = ({ defaultValues, onSubmit, isLoading }: TransactionForm
 
   const isExpense = type === 'expense';
   const activeColor = isExpense ? 'var(--expense)' : 'var(--income)';
+  const activeSubtle = isExpense ? 'var(--expense-subtle)' : 'var(--income-subtle)';
 
   const inputStyle = {
     background: 'var(--bg-elevated)',
     border: '1px solid var(--border)',
     color: 'var(--text-primary)',
   };
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.borderColor = 'var(--accent)';
-  };
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.borderColor = 'var(--border)';
-  };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col min-h-screen md:min-h-0">
-      <div className="flex-1 space-y-6 pb-24 md:pb-0">
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      <div className="space-y-5 pb-6">
+
         {/* Type Toggle Pill */}
         <div
           className="flex rounded-xl p-1"
@@ -95,183 +106,163 @@ const TransactionForm = ({ defaultValues, onSubmit, isLoading }: TransactionForm
                 key={t}
                 type="button"
                 onClick={() => handleTypeChange(t)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all duration-200"
                 style={{
                   background: active ? color : 'transparent',
                   color: active ? '#fff' : 'var(--text-secondary)',
-                  boxShadow: active ? `0 0 12px ${color}40` : 'none',
+                  boxShadow: active ? `0 0 16px ${color}35` : 'none',
                 }}
               >
-                {t === 'expense' ? '📉 Expense' : '📈 Revenue'}
+                {t === 'expense' ? <IconExpense /> : <IconRevenue />}
+                {t === 'expense' ? 'Expense' : 'Revenue'}
               </button>
             );
           })}
         </div>
 
-        {/* Title */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-            Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            placeholder="e.g. Coffee, Rent, Salary…"
-            className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-            style={inputStyle}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
-        </div>
+        {/* Desktop 2-col layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Left column */}
+          <div className="space-y-4">
+            {/* Title */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                Title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder="e.g. Coffee, Rent, Salary…"
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm"
+                style={inputStyle}
+              />
+            </div>
 
-        {/* Amount */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-            Amount
-          </label>
-          <div className="relative">
-            <span
-              className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              $
-            </span>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              min="0.01"
-              step="0.01"
-              placeholder="0.00"
-              className="mono w-full pl-8 pr-4 py-3 rounded-xl text-sm outline-none"
-              style={inputStyle}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-            />
-          </div>
-        </div>
-
-        {/* Category Grid (mobile) / Select (desktop) */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-            Category
-          </label>
-
-          {/* Mobile: 4-col grid */}
-          <div className="grid grid-cols-4 gap-2 md:hidden">
-            {categories.map((cat) => {
-              const isSelected = category === cat.key;
-              return (
-                <button
-                  key={cat.key}
-                  type="button"
-                  onClick={() => setCategory(cat.key)}
-                  className="flex flex-col items-center justify-center gap-1 rounded-xl text-xs font-medium py-3 transition-all"
-                  style={{
-                    background: isSelected ? `${activeColor}20` : 'var(--bg-elevated)',
-                    border: `1px solid ${isSelected ? activeColor : 'var(--border)'}`,
-                    color: isSelected ? activeColor : 'var(--text-secondary)',
-                    boxShadow: isSelected ? `0 0 12px ${activeColor}25` : 'none',
-                    minHeight: '72px',
-                  }}
+            {/* Amount */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                Amount
+              </label>
+              <div className="relative">
+                <span
+                  className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-base pointer-events-none"
+                  style={{ color: activeColor }}
                 >
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <span className="leading-tight text-center" style={{ fontSize: '10px' }}>
-                    {cat.label}
-                  </span>
-                </button>
-              );
-            })}
+                  $
+                </span>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                  min="0.01"
+                  step="0.01"
+                  placeholder="0.00"
+                  className="input-glow mono w-full pl-8 pr-4 py-3 rounded-xl text-lg font-bold"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                Date
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm"
+                style={{ ...inputStyle, colorScheme: 'dark' }}
+              />
+            </div>
           </div>
 
-          {/* Desktop: styled select */}
-          <div className="hidden md:block">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none appearance-none"
-              style={{
-                ...inputStyle,
-                cursor: 'pointer',
-              }}
-            >
-              {categories.map((cat) => (
-                <option key={cat.key} value={cat.key}>
-                  {cat.emoji} {cat.label}
-                </option>
-              ))}
-            </select>
+          {/* Right column */}
+          <div className="space-y-4">
+            {/* Category Grid */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                Category
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {categories.map((cat) => {
+                  const isSelected = category === cat.key;
+                  return (
+                    <button
+                      key={cat.key}
+                      type="button"
+                      onClick={() => setCategory(cat.key)}
+                      className="flex flex-col items-center justify-center gap-1 rounded-xl py-3 transition-all duration-150"
+                      style={{
+                        background: isSelected ? activeSubtle : 'var(--bg-elevated)',
+                        border: `1px solid ${isSelected ? activeColor : 'var(--border)'}`,
+                        color: isSelected ? activeColor : 'var(--text-secondary)',
+                        boxShadow: isSelected ? `0 0 10px ${activeColor}20` : 'none',
+                        minHeight: '68px',
+                      }}
+                    >
+                      <span className="text-xl leading-none">{cat.emoji}</span>
+                      <span className="leading-tight text-center font-medium" style={{ fontSize: '10px' }}>
+                        {cat.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Note */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                Note{' '}
+                <span className="normal-case font-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span>
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Any extra details…"
+                rows={3}
+                className="input-glow w-full px-4 py-3 rounded-xl text-sm resize-none"
+                style={inputStyle}
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Date */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-            Date
-          </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-            style={{
-              ...inputStyle,
-              colorScheme: 'dark',
-            }}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
-        </div>
-
-        {/* Note */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
-            Note <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
-          </label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Any extra details…"
-            rows={3}
-            className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
-            style={inputStyle}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-          />
         </div>
       </div>
 
-      {/* Sticky Bottom Bar (mobile) / Normal buttons (desktop) */}
+      {/* Action buttons */}
       <div
-        className="fixed bottom-0 left-0 right-0 flex gap-3 px-4 py-4 md:static md:flex md:pt-6"
-        style={{
-          background: 'var(--bg-base)',
-          borderTop: '1px solid var(--border)',
-        }}
+        className="flex gap-3 pt-5"
+        style={{ borderTop: '1px solid var(--border)' }}
       >
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold transition-colors"
+          className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-150"
           style={{
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border)',
             color: 'var(--text-secondary)',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
-          style={{ background: activeColor, color: '#fff' }}
+          className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-150 disabled:opacity-50"
+          style={{
+            background: activeColor,
+            color: '#fff',
+            boxShadow: `0 4px 16px ${activeColor}40`,
+          }}
         >
           {isLoading
             ? 'Saving…'

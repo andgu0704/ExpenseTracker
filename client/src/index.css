@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   --bg-base: #0A0A0F;
@@ -14,8 +14,12 @@
   --text-muted: #44445A;
   --accent: #7C6AF7;
   --accent-hover: #9B8CFF;
+  --accent-subtle: rgba(124, 106, 247, 0.08);
+  --accent-glow: rgba(124, 106, 247, 0.25);
   --income: #34D399;
+  --income-subtle: rgba(52, 211, 153, 0.08);
   --expense: #F87171;
+  --expense-subtle: rgba(248, 113, 113, 0.08);
   --warning: #FBBF24;
 }
 
@@ -38,6 +42,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Skeleton shimmer ─────────────────────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -55,6 +60,7 @@ body {
   border-radius: 8px;
 }
 
+/* ── Page entrance animation ──────────────────────────────────────── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -62,4 +68,63 @@ body {
 
 .page-enter {
   animation: fadeInUp 200ms ease-out;
+}
+
+/* ── Pulse glow — for CTAs and active nav ─────────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 16px rgba(124, 106, 247, 0.35); }
+  50%       { box-shadow: 0 0 28px rgba(124, 106, 247, 0.55); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* ── Glassmorphism card ───────────────────────────────────────────── */
+.card-glass {
+  background: rgba(17, 17, 24, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(42, 42, 56, 0.8);
+  box-shadow:
+    0 0 0 1px rgba(124, 106, 247, 0.06),
+    0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Auth page background: dot grid + radial gradient ─────────────── */
+.bg-grid {
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(124, 106, 247, 0.12) 0%, transparent 65%),
+    radial-gradient(circle, rgba(124, 106, 247, 0.15) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px;
+}
+
+/* ── Input focus glow ─────────────────────────────────────────────── */
+.input-glow {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-glow:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(124, 106, 247, 0.2);
+  outline: none;
+}
+
+/* ── Accent gradient button ───────────────────────────────────────── */
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  box-shadow: 0 4px 16px rgba(124, 106, 247, 0.3);
+  transition: box-shadow 0.2s ease, opacity 0.2s ease;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-accent:hover:not(:disabled) {
+  box-shadow: 0 6px 24px rgba(124, 106, 247, 0.45);
+}
+
+.btn-accent:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
